@@ -1,38 +1,63 @@
+* Description
+
+This is my current configuration using Nix flakes for home and work environments.
+- *macOS* (Darwin) - Home Apple M4 Pro "Seaholly" configuration.
+- *macOS* (Darwin) - Work machine configuration.
+
+Apple Silicon Mac uses nix-darwin. GUI applications are installed with nix-homebrew.
+
+* Key Features
+
+Cool features:
+
+- *Home manager module system*: a common configuration applies to most of the machines in use. Anything requiring some refined configuration gets added or overridden in a machine-specific file, which imports common.
+- *SSH management*: Home manager is used to manage SSH configuration. A primary machine key name is an input to the common file.
+- *Environment variables*: Configuration uses NIXCONFIG_DIR environment variable for easy path resolution on any machine.
+- *Emacs*: Home manager places the configuration files as well as package lockfiles in their appropriate directories.
+
+* Dependencies (Flake Inputs)
+- nixpkgs (stable and unstable)
+- nix-darwin (macOS system management)
+- home-manager (user environment management)
+- nix-homebrew (macOS package management)
+- nixos-hardware (hardware-specific configurations)
+
 * Installation / Use
-** 1. Install nix
+
+Install nix
 #+begin_src bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 #+end_src
 
-** 2. Clone repo
+Clone repo
 #+begin_src bash
-git clone <your-repo-url>
+git clone <repo-url>
 cd nix-config
 #+end_src
 
-** 3. Bootstrap
+Bootstrap
 #+begin_src bash
 nix run nix-darwin -- switch --flake ~/Git/nix-config/
 #+end_src
 
-** 4. Edit configuration.nix or home.nix
+Edit configuration.nix or home.nix and apply
 #+begin_src bash
 darwin-rebuild switch --flake .
 #+end_src
 
-** 5. Monthly/weekly update cycle
+Monthly/weekly update cycle
 
-*** Update inputs
+Update inputs
 #+begin_src bash
 nix flake update ~/Git/nix-config/
 #+end_src
 
-*** Apply updates
+Apply updates
 #+begin_src bash
 darwin-rebuild switch --flake ~/Git/nix-config/
 #+end_src
 
-*** Or combined
+Or combined (update + apply)
 #+begin_src bash
 nix flake update ~/Git/nix-config && darwin-rebuild switch --flake ~/Git/nix-config/
 #+end_src
