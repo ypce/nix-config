@@ -1,0 +1,38 @@
+* Installation / Use
+** 1. Install nix
+#+begin_src bash
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+#+end_src
+
+** 2. Clone repo
+#+begin_src bash
+git clone <your-repo-url>
+cd nix-config
+#+end_src
+
+** 3. Bootstrap
+#+begin_src bash
+nix run nix-darwin -- switch --flake ~/Git/nix-config/
+#+end_src
+
+** 4. Edit configuration.nix or home.nix
+#+begin_src bash
+darwin-rebuild switch --flake .
+#+end_src
+
+** 5. Monthly/weekly update cycle
+
+*** Update inputs
+#+begin_src bash
+nix flake update ~/Git/nix-config/
+#+end_src
+
+*** Apply updates
+#+begin_src bash
+darwin-rebuild switch --flake ~/Git/nix-config/
+#+end_src
+
+*** Or combined
+#+begin_src bash
+nix flake update ~/Git/nix-config && darwin-rebuild switch --flake ~/Git/nix-config/
+#+end_src
