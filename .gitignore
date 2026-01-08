@@ -1,0 +1,17 @@
+# Nix build results
+result
+result-*
+
+# macOS
+.DS_Store
+
+# Do NOT ignore secrets/*.age (they're encrypted!)
+# But ignore any plaintext secrets:
+secrets/*.txt
+secrets/*.key
+secrets/decrypted/
+private/
+
+# aria2 DHT files
+home/aria2/dht.dat
+home/aria2/dht6.dat

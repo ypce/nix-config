@@ -1,0 +1,203 @@
+[colors]
+ansi = [
+    '#21222c',
+    '#ff5555',
+    '#50fa7b',
+    '#f1fa8c',
+    '#bd93f9',
+    '#ff79c6',
+    '#8be9fd',
+    '#f8f8f2',
+]
+background = '#282a36'
+brights = [
+    '#6272a4',
+    '#ff6e6e',
+    '#69ff94',
+    '#ffffa5',
+    '#d6acff',
+    '#ff92df',
+    '#a4ffff',
+    '#ffffff',
+]
+compose_cursor = '#ffb86c'
+cursor_bg = '#f8f8f2'
+cursor_border = '#f8f8f2'
+cursor_fg = '#282a36'
+foreground = '#f8f8f2'
+scrollbar_thumb = '#44475a'
+selection_bg = 'rgba(26.666668% 27.843138% 35.294117% 50%)'
+selection_fg = 'rgba(0% 0% 0% 0%)'
+split = '#6272a4'
+
+[colors.indexed]
+
+[colors.tab_bar]
+background = '#282a36'
+
+[colors.tab_bar.active_tab]
+bg_color = '#bd93f9'
+fg_color = '#282a36'
+intensity = 'Normal'
+italic = false
+strikethrough = false
+underline = 'None'
+
+[colors.tab_bar.inactive_tab]
+bg_color = '#282a36'
+fg_color = '#f8f8f2'
+intensity = 'Normal'
+italic = false
+strikethrough = false
+underline = 'None'
+
+[colors.tab_bar.inactive_tab_hover]
+bg_color = '#6272a4'
+fg_color = '#f8f8f2'
+intensity = 'Normal'
+italic = true
+strikethrough = false
+underline = 'None'
+
+[colors.tab_bar.new_tab]
+bg_color = '#282a36'
+fg_color = '#f8f8f2'
+intensity = 'Normal'
+italic = false
+strikethrough = false
+underline = 'None'
+
+[colors.tab_bar.new_tab_hover]
+bg_color = '#ff79c6'
+fg_color = '#f8f8f2'
+intensity = 'Normal'
+italic = true
+strikethrough = false
+underline = 'None'
+
+[metadata]
+aliases = []
+author = 'timescam'
+name = 'Dracula (Official)'
+origin_url = 'https://github.com/dracula/wezterm'
+```
+
+modules/mappings.lua
+```
+
+local wezterm = require("wezterm")
+local act = wezterm.action
+
+return {
+	leader = { key = "a", mods = "CTRL" },
+
+	keys = {
+		{
+			key = "w",
+			mods = "CMD",
+			action = act.CloseCurrentPane({ confirm = true }),
+		},
+
+		-- activate resize mode
+		{
+			key = "r",
+			mods = "LEADER",
+			action = act.ActivateKeyTable({
+				name = "resize_pane",
+				one_shot = false,
+			}),
+		},
+
+		-- focus panes
+		{ key = "h",	mods = "LEADER",	action = act.ActivatePaneDirection("Left"), },
+		{ key = "e",	mods = "LEADER",	action = act.ActivatePaneDirection("Up"), },
+		{ key = "n",	mods = "LEADER",	action = act.ActivatePaneDirection("Down"), },
+		{ key = "i",	mods = "LEADER",	action = act.ActivatePaneDirection("Right"), },
+
+		-- focus panes Arrows
+		{ key = "LeftArrow",	mods = "LEADER",	action = act.ActivatePaneDirection("Left"), },
+		{ key = "UpArrow",	mods = "LEADER",	action = act.ActivatePaneDirection("Up"), },
+		{ key = "DownArrow",	mods = "LEADER",	action = act.ActivatePaneDirection("Down"), },
+		{ key = "RightArrow",	mods = "LEADER",	action = act.ActivatePaneDirection("Right"), },
+
+		-- add new panes
+		{ key = "h", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }), },
+		{ key = "v", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }), },
+		-- rotate panes
+		{ key = "c", mods = "LEADER", action = act.RotatePanes("CounterClockwise") },
+	},
+
+	key_tables = {
+		resize_pane = {
+			{ key = "LeftArrow", action = act.AdjustPaneSize({ "Left", 5 }) },
+			{ key = "h", action = act.AdjustPaneSize({ "Left", 5 }) },
+
+			{ key = "RightArrow", action = act.AdjustPaneSize({ "Right", 5 }) },
+			{ key = "i", action = act.AdjustPaneSize({ "Right", 5 }) },
+
+			{ key = "UpArrow", action = act.AdjustPaneSize({ "Up", 2 }) },
+			{ key = "n", action = act.AdjustPaneSize({ "Up", 2 }) },
+
+			{ key = "DownArrow", action = act.AdjustPaneSize({ "Down", 2 }) },
+			{ key = "e", action = act.AdjustPaneSize({ "Down", 2 }) },
+
+			{ key = "Escape", action = "PopKeyTable" },
+		},
+	},
+}
+
+```
+
+wezterm.lua
+```
+local wezterm = require 'wezterm';
+local mappings = require("modules.mappings")
+
+-- Show which key table is active in the status area
+wezterm.on("update-right-status", function(window, pane)
+	local name = window:active_key_table()
+	if name then
+		name = "TABLE: " .. name
+	end
+	window:set_right_status(name or "")
+end)
+
+return {
+	default_cursor_style = "BlinkingBlock",
+	color_scheme = "Poimandres",
+	colors = {
+		cursor_bg = "#A6ACCD",
+		cursor_border = "#A6ACCD",
+		cursor_fg = "#1B1E28",
+	},
+	-- font
+  font = wezterm.font("Aeonik Mono", {weight="Medium"}),
+	font_size = 18,
+	line_height = 1.2,
+	window_background_opacity = 0.9,
+	-- tab bar
+	use_fancy_tab_bar = false,
+	tab_bar_at_bottom = true,
+	hide_tab_bar_if_only_one_tab = true,
+	tab_max_width = 999999,
+	window_padding = {
+		left = 30,
+		right = 30,
+		top = 30,
+		bottom = 30,
+	},
+	window_decorations = "RESIZE",
+	inactive_pane_hsb = {
+		brightness = 0.7,
+	},
+  inactive_pane_hsb = {
+    saturation = 0.9,
+    brightness = 0.8,
+  },
+	send_composed_key_when_left_alt_is_pressed = false,
+	send_composed_key_when_right_alt_is_pressed = true,
+	-- key bindings
+	leader = mappings.leader,
+	keys = mappings.keys,
+	key_tables = mappings.key_tables,
+}
