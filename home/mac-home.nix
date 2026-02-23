@@ -6,31 +6,29 @@
     ./modules/aria2-personal.nix
     ./modules/emacs-personal.nix
     ./modules/browser.nix
-    # ./modules/taskwarrior.nix
   ];
 
   home = {
     stateVersion = "25.05";
     
     packages = with pkgs; [
+      # :START_TODO:
       # https://github.com/casey/just
       # https://dystroy.org/bacon/
       # https://github.com/PaulJuliusMartinez/jless
-      # https://github.com/lobehub/lobe-icons
       # https://github.com/xenodium/agent-shell
       # https://www.reddit.com/r/emacs/comments/1qecqbs/experimenting_with_a_faster_tramp_backend_using/
-      #
       # https://revpdf.com/download.html
       # nix profile add github:Mjoyufull/setrixtuix 
-        # taskwarrior3
       # claude-code
+      # fava
+      # tailscale
+      # qmk
+      # :END_TODO:
       mpv
       (pkgs.writeShellScriptBin "e" ''
         exec emacsclient -c -nw -a "" "$@"
       '')
-      # fava
-      # tailscale
-      # qmk
     ];
     
     file.".claude/settings.json".text = ''
@@ -54,7 +52,7 @@
       $DRY_RUN_CMD rm -rf $HOME/.local/fonts
       if [ -d "$PRIVATE_DIR/.local/fonts" ]; then
         $DRY_RUN_CMD ln -sf "$PRIVATE_DIR/.local/fonts" $HOME/.local/fonts
-        echo "✓ Linked private fonts"
+        echo "Linked private fonts"
       fi
   
       # Link/copy SSH files
@@ -69,11 +67,11 @@
           if [[ "$filename" != *.pub && "$filename" != "config"* && "$filename" != "known_hosts"* ]]; then
             $DRY_RUN_CMD cp "$file" "$target"
             $DRY_RUN_CMD chmod 600 "$target"
-            echo "✓ Copied $filename (private key)"
+            echo "Copied $filename (private key)"
           else
             # Symlink everything else (config files, public keys)
             $DRY_RUN_CMD ln -sf "$file" "$target"
-            echo "✓ Linked $filename"
+            echo "Linked $filename"
           fi
         done
       fi
