@@ -1,0 +1,15 @@
+ARTIFACT_SOURCES=(
+  ".config/fish/*.fish"
+  ".config/fish/functions/*.fish"
+  ".emacs.d/early-init.el"
+  ".emacs.d/init.el"
+  ".emacs.d/programming.el"
+  ".emacs.d/dracula-pro-pro-theme.el"
+  ".config/yazi/*.toml"
+  ".config/yazi/*.toml"
+  ".config/yazi/flavors/dracula.yazi/*.toml"
+  ".config/helix/*.toml"
+  ".config/helix/themes/*.toml"
+  ".config/ghostty/config"
+  ".config/ghostty/themes/pro"
+)

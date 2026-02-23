@@ -1,0 +1,59 @@
+[[input.prepend_keymap]]
+desc = "Cancel"
+on = ["<Esc>"]
+run = "close"
+
+[[mgr.prepend_keymap]]
+desc = "Down"
+on = ["n"]
+run = "arrow 1"
+
+[[mgr.prepend_keymap]]
+desc = "Up"
+on = ["e"]
+run = "arrow -1"
+
+[[mgr.prepend_keymap]]
+desc = "Enter"
+on = ["i"]
+run = "enter"
+
+[[mgr.prepend_keymap]]
+desc = "Down 5"
+on = ["N"]
+run = "arrow 5"
+
+[[mgr.prepend_keymap]]
+desc = "Up 5"
+on = ["E"]
+run = "arrow -5"
+
+[[mgr.prepend_keymap]]
+desc = "Half page down"
+on = ["<C-n>"]
+run = "arrow 50%"
+
+[[mgr.prepend_keymap]]
+desc = "Half page up"
+on = ["<C-e>"]
+run = "arrow -50%"
+
+[[mgr.prepend_keymap]]
+desc = "Go home"
+on = ["g", "h"]
+run = "cd ~"
+
+[[mgr.prepend_keymap]]
+desc = "Open in Emacs"
+on = ["f"]
+run = "shell 'emacsclient -c -nw -a \"\" \"$@\"' --block"
+
+[[pick.prepend_keymap]]
+desc = "Down"
+on = ["n"]
+run = "arrow 1"
+
+[[pick.prepend_keymap]]
+desc = "Up"
+on = ["e"]
+run = "arrow -1"

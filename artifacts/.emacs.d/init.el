@@ -4,8 +4,8 @@
 ;; Only check for modifications when you save files or explicitly
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 
-(add-to-list 'exec-path "/etc/profiles/per-user/vp/bin")
-(setenv "PATH" (concat "/etc/profiles/per-user/vp/bin:" (getenv "PATH")))
+(add-to-list 'exec-path "/opt/homebrew/bin")
+(setenv "PATH" (concat "/opt/homebrew/bin:" (getenv "PATH")))
 
 ;; Bootstrap Straight.el
 (defvar bootstrap-version)
@@ -32,13 +32,7 @@
   :custom
   (straight-use-package-by-default t)
   (straight-current-profile 'base)
-  (straight-vc-git-default-protocol 'ssh)
-  :config
-  (when (getenv "NIXCONFIG_DIR")
-    (let ((nixdir (file-name-as-directory (getenv "NIXCONFIG_DIR"))))
-	  (setq straight-profiles
-            `((base . ,(file-name-concat nixdir "emacs/straight.lockfile.default.el"))
-              (programming . ,(file-name-concat nixdir "emacs/straight.lockfile.programming.el")))))))
+  (straight-vc-git-default-protocol 'ssh))
 
 (use-package general)
 

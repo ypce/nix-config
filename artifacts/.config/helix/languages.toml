@@ -1,0 +1,58 @@
+[[language]]
+auto-format = true
+comment-token = "//"
+file-types = ["go"]
+injection-regex = "go"
+language-servers = ["gopls", "golangci-lint-lsp"]
+name = "go"
+roots = ["go.work", "go.mod"]
+scope = "source.go"
+
+[language.indent]
+tab-width = 4
+unit = "\t"
+
+[[language]]
+file-types = ["md", "markdown", "mkd", "mkdn", "mdwn", "mdown", "markdn", "mdtxt", "mdtext", "workbook"]
+injection-regex = "md|markdown"
+language-servers = ["scls", "marksman", "markdown-oxide"]
+name = "markdown"
+
+[language.block-comment-tokens]
+end = "-->"
+start = "<!--"
+
+[language.indent]
+tab-width = 2
+unit = "  "
+
+[[language]]
+language-servers = ["scls"]
+name = "git-commit"
+
+[language-server.golangci-lint-lsp]
+command = "golangci-lint-langserver"
+
+[language-server.gopls]
+command = "gopls"
+
+[language-server.markdown-oxide]
+command = "markdown-oxide"
+
+[language-server.marksman]
+command = "marksman"
+
+[language-server.scls]
+command = "simple-completion-language-server"
+
+[language-server.scls.config]
+feature_paths = true
+feature_snippets = true
+feature_unicode_input = true
+feature_words = true
+max_completion_items = 20
+snippets_first = true
+
+[language-server.scls.environment]
+LOG_FILE = "/tmp/completion.log"
+RUST_LOG = "info,simple-completion-langauge-server=info"
