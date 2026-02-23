@@ -13,40 +13,47 @@
   homebrew = {
     enable = true;
     onActivation.cleanup = "zap";
-    onActivation.autoUpdate = true;
-    onActivation.upgrade = true;
+    onActivation.autoUpdate = false;
+    onActivation.upgrade = false;
     
     brews = [
       { name = "emacs-plus"; }
     ];
     
     casks = [
-      "ghostty"
-      "wezterm"
-      "chromium"
-      "whatsapp"
       "appcleaner"
-      "firefox"
-      "discord"
-      "slack"
-      "proton-mail-bridge"
-      "tuta-mail"
+      "chromium"
       "claude"
+      "discord"
+      "eqmac"
+      "firefox"
+      "ghostty"
       "keepassxc"
       "leader-key"
-      "loop"
-      "museeks"
-      "eqmac"
       "localsend"
+      "loop"
       "mac-mouse-fix"
+      "museeks"
+      "proton-mail-bridge"
+      "slack"
+      "tuta-mail"
       "vnc-viewer"
+      "wezterm"
+      "whatsapp"
+      # "tailscale"
+      # "libreoffice"
+      # "rawtherapee"
+      # "battle-net"
+      # "netbird"
+      # "antinote"
+      # "qudelix-5k"
     ];
     
     masApps = {
-      "Yubico Authenticator" = 1497506650;
       # "Numbers" = 409203825;
       # "Pages" = 409201541;
-      # "Windows App" = 1295203466;
+      "Yubico Authenticator" = 1497506650;
+      "Windows App" = 1295203466;
     };
   };
   fonts.packages = with pkgs; [

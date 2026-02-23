@@ -53,7 +53,6 @@
       lg = "lazygit";
       
       # Tools
-      e = "emacsclient -c -nw";
       edaemon = "emacs --bg-daemon";
       
       # Grep with color
@@ -67,7 +66,7 @@
         cd -
         and ls -aG
       '';
-      
+
       # Fuzzy directory navigation with fzf
       j = ''
         set -l dir (fd -t d -H --max-depth 5 . ~ 2>/dev/null | fzf --reverse --height 40% --prompt="Navigate to: ")

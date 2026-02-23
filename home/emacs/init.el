@@ -109,19 +109,7 @@
 ;;; Themes + Visuals ---------
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
 (load-theme 'dracula-pro-pro t)
-;; Make background transparent in TTY frames
 (setq frame-background-mode 'dark)
-
-(defun my/transparent-tty-background (&optional frame)
-  (let ((frame (or frame (selected-frame))))
-    (unless (display-graphic-p frame)
-      (set-face-background 'default "unspecified-bg" frame)
-      (set-face-background 'fringe "unspecified-bg" frame)
-      (set-terminal-parameter (frame-terminal frame) 'background-mode 'dark))))
-
-(add-hook 'after-init-hook #'my/transparent-tty-background)
-(add-hook 'after-make-frame-functions #'my/transparent-tty-background)
-(advice-add 'load-theme :after (lambda (&rest _) (my/transparent-tty-background)))
 
 (use-package diminish)
 

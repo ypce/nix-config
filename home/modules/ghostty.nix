@@ -5,9 +5,9 @@
   home.file.".config/ghostty/config".text = ''
     # appearance
     theme = pro
-    alpha-blending = native
-    background-opacity = 0.90
-    background-blur = 20
+    # alpha-blending = native
+    # background-opacity = 0.90
+    # background-blur = 20
     window-colorspace = display-p3
     macos-titlebar-style = tabs
     macos-titlebar-proxy-icon = hidden

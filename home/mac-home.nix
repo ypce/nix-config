@@ -21,10 +21,13 @@
       # https://www.reddit.com/r/emacs/comments/1qecqbs/experimenting_with_a_faster_tramp_backend_using/
       #
       # https://revpdf.com/download.html
-      # nix profile add github:Mjoyufull/setrixtui
-      # taskwarrior3
+      # nix profile add github:Mjoyufull/setrixtuix 
+        # taskwarrior3
       # claude-code
       mpv
+      (pkgs.writeShellScriptBin "e" ''
+        exec emacsclient -c -nw -a "" "$@"
+      '')
       # fava
       # tailscale
       # qmk

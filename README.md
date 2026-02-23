@@ -16,7 +16,7 @@ nix run nix-darwin -- switch --flake .#Seaholly
 
 ## Daily use
 ```bash
-n        # rebuild
+n                      # rebuild
 nix flake update && n  # update + rebuild
 ```
 

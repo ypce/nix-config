@@ -22,6 +22,12 @@
         max_width = 6000;
         max_height = 8000;
       };
+
+      opener = {
+        emacs = [
+          { run = "emacsclient -c -nw \"$@\""; block = true; }
+        ];
+      };
     };
     
     keymap = {
@@ -37,6 +43,8 @@
         { on = [ "<C-e>" ]; run = "arrow -50%"; desc = "Half page up"; }
         # Quick directory jumps
         { on = [ "g" "h" ]; run = "cd ~"; desc = "Go home"; }
+        { on = [ "f" ]; run = ''shell 'emacsclient -c -nw -a "" "$@"' --block''; desc = "Open in Emacs"; }
+        
       ];
       
       pick.prepend_keymap = [
