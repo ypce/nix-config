@@ -72,6 +72,13 @@
         set -l dir (fd -t d -H --max-depth 5 . ~ 2>/dev/null | fzf --reverse --height 40% --prompt="Navigate to: ")
         test -n "$dir"; and cd "$dir"
       '';
+
+      l = ''
+        set date (date +"%Y-%m-%d")
+        set time (date +"%H:%M")
+        set daily_file $HOME/Notes/daily/$date.org
+        echo "** $time $argv" >> $daily_file
+      '';
     };
     
     # Fish plugins (optional, fish is great without them)
