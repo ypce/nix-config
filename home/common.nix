@@ -15,7 +15,11 @@ in
   ];
 
   home.packages = with pkgs; [
+    jless
+    just
     fd
+    gh
+    glow
     fzf
     htop
     btop

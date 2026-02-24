@@ -13,19 +13,15 @@
     
     packages = with pkgs; [
       # :START_TODO:
-      # https://github.com/casey/just
-      # https://dystroy.org/bacon/
-      # https://github.com/PaulJuliusMartinez/jless
       # https://github.com/xenodium/agent-shell
       # https://www.reddit.com/r/emacs/comments/1qecqbs/experimenting_with_a_faster_tramp_backend_using/
       # https://revpdf.com/download.html
-      # nix profile add github:Mjoyufull/setrixtuix 
-      # claude-code
-      # fava
-      # tailscale
-      # qmk
+      # Mjoyufull/setrixtuix 
       # :END_TODO:
       mpv
+      fava
+      claude-code
+      qmk
       (pkgs.writeShellScriptBin "e" ''
         exec emacsclient -c -nw -a "" "$@"
       '')

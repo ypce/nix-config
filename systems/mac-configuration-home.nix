@@ -40,18 +40,11 @@
       "vnc-viewer"
       "wezterm"
       "whatsapp"
-      # "tailscale"
-      # "libreoffice"
-      # "rawtherapee"
-      # "battle-net"
-      # "netbird"
-      # "antinote"
-      # "qudelix-5k"
+      "tailscale"
+      "libreoffice"
     ];
     
     masApps = {
-      # "Numbers" = 409203825;
-      # "Pages" = 409201541;
       "Yubico Authenticator" = 1497506650;
       "Windows App" = 1295203466;
     };
