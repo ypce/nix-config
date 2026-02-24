@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/artifacts-map.sh"
+source "$SCRIPT_DIR/map.sh"
 
 REPO_DIR="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 EXPORT_DIR="$REPO_DIR/artifacts"
