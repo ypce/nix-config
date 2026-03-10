@@ -35,7 +35,7 @@ status is-interactive; and begin
         tide configure --auto --style=Lean --prompt_colors='True color' --show_time=No --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No
         set -U tide_configured yes
     end
-    zoxide init fish | source
-    atuin init fish | source
-    direnv hook fish | source
+    # zoxide init fish | source
+    # atuin init fish | source
+    # direnv hook fish | source
 end

@@ -15,7 +15,7 @@ window-padding-color = extend
 unfocused-split-opacity = 1
 
 # fonts
-font-size = 20
+font-size = 18
 font-family = Aeonik Mono
 font-variation = wght=300
 font-variation = wdth=100

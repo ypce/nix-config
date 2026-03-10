@@ -45,7 +45,7 @@ run = "cd ~"
 
 [[mgr.prepend_keymap]]
 desc = "Open in Emacs"
-on = ["f"]
+on = ["p"]
 run = "shell 'emacsclient -c -nw -a \"\" \"$@\"' --block"
 
 [[pick.prepend_keymap]]
