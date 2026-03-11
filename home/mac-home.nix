@@ -79,7 +79,7 @@
     
     fish = {
       shellAliases = {
-        n = "sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly && $NIXCONFIG_DIR/artifacts/export.sh";
+        n = "sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly";
         so = "rclone bisync ~/Org/ yarrow-sftp:/ --check-access --conflict-resolve newer --conflict-loser num --conflict-suffix 'conflict-{DateOnly}' --create-empty-src-dirs --resilient --recover --max-lock 2m -MvP";
       };
     };

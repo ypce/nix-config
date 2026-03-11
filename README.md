@@ -27,9 +27,8 @@ nix-store --optimise
 darwin-rebuild --rollback
 ```
 
-## Non-Nix machines
-The `artifacts/` folder contains generated, Nix-reference-free versions of all config files, kept in sync automatically on every rebuild.
+## Non-Nix machine emacs config
 ```bash
-# symlink configs to correct locations
-./artifacts/install.sh
+# symlink emacs configs to correct locations
+ln -sfn "$(pwd)/home/emacs" "$HOME/.emacs.d"
 ```

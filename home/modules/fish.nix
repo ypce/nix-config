@@ -77,7 +77,16 @@
         set date (date +"%Y-%m-%d")
         set time (date +"%H:%M")
         set daily_file $HOME/Notes/daily/$date.org
-        echo "** $time $argv" >> $daily_file
+
+        if test (count $argv) -eq 0
+            set tmpfile (mktemp /tmp/log-XXXXXX.org)
+            e $tmpfile
+            and echo "** $time" >> $daily_file
+            and cat $tmpfile >> $daily_file
+            rm $tmpfile
+        else
+            echo "** $time $argv" >> $daily_file
+        end
       '';
     };
     
