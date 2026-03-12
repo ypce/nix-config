@@ -283,6 +283,9 @@
 
   (add-hook 'org-capture-mode-hook #'delete-other-windows))
 
+(general-define-key
+ "C-c a" 'org-agenda
+ "C-c c" 'org-capture)
 
 ;;; Org Superstar -----
 (use-package org-superstar
@@ -314,7 +317,8 @@
             (lambda ()
               (when buffer-file-name
                 (add-to-list 'org-agenda-files buffer-file-name)))))
-                
+
+
 ;;; Which Key -----
 (use-package which-key
   :diminish which-key-mode
