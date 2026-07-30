@@ -1,10 +1,14 @@
-;; init.el --- init -*- lexical-binding: t; -*-
+;;; init.el --- init -*- lexical-binding: t; -*-
 ;;; Code:
 
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 
-(add-to-list 'exec-path "/etc/profiles/per-user/vp/bin")
-(setenv "PATH" (concat "/etc/profiles/per-user/vp/bin:" (getenv "PATH")))
+;; Nix bin path (guarded so config still works on non-Nix systems)
+(let ((nix-bin "/etc/profiles/per-user/vp/bin"))
+  (when (file-directory-p nix-bin)
+    (add-to-list 'exec-path nix-bin)
+    (setenv "PATH" (concat nix-bin ":" (getenv "PATH")))))
+
 
 ;;; Bootstrap Straight.el -----
 (defvar bootstrap-version)
@@ -31,20 +35,37 @@
   :custom
   (straight-use-package-by-default t)
   (straight-current-profile 'base)
-  (straight-vc-git-default-protocol 'ssh)
+  ;; HTTPS by default - Emacs daemons often don't inherit SSH_AUTH_SOCK,
+  ;; which causes opaque clone failures. Public repos don't need SSH.
+  ;; Use a git `insteadOf` rewrite if you want to push over SSH.
+  (straight-vc-git-default-protocol 'https)
   :config
   (when (getenv "NIXCONFIG_DIR")
     (let ((nixdir (file-name-as-directory (getenv "NIXCONFIG_DIR"))))
       (setq straight-profiles
-            `((base . ,(file-name-concat nixdir "emacs/straight.lockfile.default.el"))
+            `((base        . ,(file-name-concat nixdir "emacs/straight.lockfile.default.el"))
               (programming . ,(file-name-concat nixdir "emacs/straight.lockfile.programming.el")))))))
 
-(use-package general)
+;; general provides use-package keywords (:general, :general-config),
+;; so it must be loaded before any use-package form that uses them.
+(use-package general :demand t)
 
 (use-package kkp
   :straight (:host github :repo "benotn/kkp")
-  :config
-  (global-kkp-mode +1))
+  :config (global-kkp-mode +1))
+
+
+;;; Mode line -----
+(defun vp/mode-line ()
+  "Custom mode-line format."
+  '(" - "
+    (:eval (propertize (buffer-name) 'face 'font-lock-constant-face))
+    "%6l:%c (%o) "
+    (:eval (when vc-mode
+             (concat " | ⇅ " (substring-no-properties vc-mode 5))))
+    mode-line-format-right-align
+    (:eval (concat "  " (symbol-name major-mode)))
+    "  " mode-line-misc-info))
 
 
 ;;; Basic Emacs options -----
@@ -62,28 +83,21 @@
         ring-bell-function 'ignore
         custom-safe-themes t
         initial-buffer-choice t)
+  :hook ((prog-mode . display-line-numbers-mode)
+         (prog-mode . show-paren-mode))
   :config
   (setq-default truncate-lines t
                 display-line-numbers-width 3
                 indent-tabs-mode nil
                 fill-column 100
-                tab-width 4)
+                tab-width 4
+                mode-line-format (vp/mode-line))
 
   (auto-save-visited-mode 1)
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (xterm-mouse-mode 1)
-
-  (setq-default mode-line-format
-                '(" - "
-                  (:eval (propertize (buffer-name) 'face 'font-lock-constant-face))
-                  "%6l:%c (%o) "
-                  (:eval (unless (not vc-mode)
-                           (concat " | ⇅ " (substring-no-properties vc-mode 5))))
-                  mode-line-format-right-align
-                  (:eval (concat "  " (symbol-name major-mode)))
-                  "  " mode-line-misc-info))
 
   :general-config
   ("M-s" 'other-window)
@@ -115,27 +129,26 @@
 
 
 ;;; Themes + Visuals -----
+;; Silence cosmetic "nil value is invalid, use 'unspecified" face warnings
+;; that the dracula-pro-pro theme emits on theme load and on every new client frame.
+(advice-add 'display-warning :around
+            (lambda (orig &rest args)
+              (let ((msg (cadr args)))
+                (unless (and (stringp msg)
+                             (string-match-p "nil value is invalid" msg))
+                  (apply orig args)))))
+
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
-(load-theme 'dracula-pro-pro t)
 (setq frame-background-mode 'dark)
+(load-theme 'dracula-pro-pro t)
 
 (defun vp/transparent-background ()
+  "Unset the default background in terminal frames for true transparency."
   (unless (display-graphic-p)
     (set-face-background 'default "unspecified-bg" (selected-frame))))
 
-(add-hook 'window-setup-hook #'vp/transparent-background)
+(add-hook 'window-setup-hook            #'vp/transparent-background)
 (add-hook 'server-after-make-frame-hook #'vp/transparent-background)
-
-(use-package diminish)
-
-(use-package centered-cursor-mode
-  :commands (centered-cursor-mode)
-  :diminish centered-cursor-mode)
-
-(use-package golden-ratio
-  :diminish golden-ratio-mode
-  :hook (after-init . golden-ratio-mode)
-  :config (golden-ratio-toggle-widescreen))
 
 
 ;;; Completions -----
@@ -165,11 +178,14 @@
   :config
   (consult-customize consult-buffer :sort t)
   (delq 'consult--source-recent-file consult-buffer-sources)
-  (add-to-list 'consult-buffer-filter "\\`\\*lsp-\.*\\'")
-  (add-to-list 'consult-buffer-filter "\\`\\*rust-analyzer\.*\\'")
-  (let ((buffers '("*Async-native-compile-log*" "*straight-process*" "*direnv*" "*Messages*")))
-    (dolist (buf buffers)
-      (add-to-list 'consult-buffer-filter (regexp-quote buf)))))
+  (dolist (pat '("\\`\\*lsp-\.*\\'"
+                 "\\`\\*rust-analyzer\.*\\'"))
+    (add-to-list 'consult-buffer-filter pat))
+  (dolist (buf '("*Async-native-compile-log*"
+                 "*straight-process*"
+                 "*direnv*"
+                 "*Messages*"))
+    (add-to-list 'consult-buffer-filter (regexp-quote buf))))
 
 (use-package corfu
   :config
@@ -194,10 +210,6 @@
       (f (expand-file-name "programming.el" user-emacs-directory)))
   (when (file-exists-p f) (load f)))
 
-(use-package emacs
-  :hook (prog-mode . display-line-numbers-mode)
-  :hook (prog-mode . show-paren-mode))
-
 
 ;;; Dired -----
 (use-package dired
@@ -215,19 +227,22 @@
              :files ("lisp/*.el"))
   :after dired
   :general-config
-  (:keymaps 'dired-mode-map   "?" #'casual-dired-tmenu)
-  (:keymaps 'isearch-mode-map "?" #'casual-isearch-tmenu)
-  (:keymaps 'ibuffer-mode-map "?" #'casual-ibuffer-tmenu)
-  (:keymaps 'Info-mode-map    "?" #'casual-info-tmenu)
+  (:keymaps 'dired-mode-map   "?"   #'casual-dired-tmenu)
+  (:keymaps 'isearch-mode-map "?"   #'casual-isearch-tmenu)
+  (:keymaps 'ibuffer-mode-map "?"   #'casual-ibuffer-tmenu)
+  (:keymaps 'Info-mode-map    "?"   #'casual-info-tmenu)
   (:keymaps 'org-mode-map     "C-?" #'casual-org-tmenu))
 
 
 ;;; Org Mode -----
+(defun vp/refresh-agenda-files ()
+  "Rebuild `org-agenda-files' from `org-directory'."
+  (interactive)
+  (setq org-agenda-files (directory-files-recursively org-directory "\\.org$")))
+
 (use-package org
   :straight (:host github :repo "bzg/org-mode" :branch "main")
   :hook (org-mode . visual-line-mode)
-  :hook (org-mode . (lambda () (diminish 'org-indent-mode)))
-  :diminish visual-line-mode
   :general-config
   (:keymaps 'org-mode-map :states 'motion
    "<TAB>" 'org-cycle)
@@ -239,16 +254,22 @@
   :custom
   (org-ellipsis " ⤵")
   (org-startup-indented t)
+  (org-startup-folded 'content)
   (org-cycle-separator-lines 1)
   (org-hide-emphasis-markers t)
+  (org-log-done 'time)
+  (org-log-into-drawer t)
+  (org-tags-column 0)
+  (org-fold-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respects-content t)
+  (org-clock-persist 'history)
+  (org-clock-out-when-done t)
+  (org-clock-into-drawer t)
   :config
-  ;; Single directory for everything
-  (setq org-directory (file-truename "~/Notes"))
+  (setq org-directory (file-truename "~/org"))
+  (vp/refresh-agenda-files)
 
-  (setq org-agenda-files
-        (directory-files-recursively "~/Notes" "\\.org$"))
-
-  ;; TODO states
   (setq org-todo-keywords
         '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
@@ -257,7 +278,6 @@
           ("WAIT"      . (:foreground "#f1fa8c"))
           ("CANCELLED" . (:foreground "#6272a4" :strike-through t))))
 
-  ;; Capture templates
   (setq org-capture-templates
         `(("i" "Inbox" entry
            (file ,(expand-file-name "inbox.org" org-directory))
@@ -275,34 +295,55 @@
            (file+headline ,(expand-file-name "agenda.org" org-directory) "Events")
            "* %?\n<%<%Y-%m-%d %a %H:00>>")))
 
-  ;; Refile into any open org file, up to 3 levels deep
-  (setq org-refile-targets
-        '((org-agenda-files :maxlevel . 3)))
-  (setq org-refile-use-outline-path 'file)
-  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3))
+        org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil)
 
+  (org-clock-persistence-insinuate)
   (add-hook 'org-capture-mode-hook #'delete-other-windows))
 
 (general-define-key
  "C-c a" 'org-agenda
  "C-c c" 'org-capture)
 
-;;; Org Superstar -----
-(use-package org-superstar
+
+;;; Org Extensions -----
+(use-package org-modern
   :after org
-  :hook (org-mode . org-superstar-mode)
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda))
   :custom
-  (org-superstar-headline-bullets-list '("❯" "❯" "❯" "❯" "❯" "❯" "❯"))
-  (org-superstar-item-bullet-alist '((?* . ?-) (?+ . ?›) (?- . ?–)))
-  (org-superstar-checkbox-alist '((?X . ?✓) (?\s . ?☐) (?- . ?–)))
-  (org-superstar-remove-leading-stars nil)
-  (org-superstar-special-todo-items nil))
+  (org-modern-star 'replace)
+  (org-modern-replace-stars "❯")
+  (org-modern-list '((?* . "•") (?+ . "›") (?- . "–")))
+  (org-modern-checkbox '((?X . "✓") (?\s . "☐") (?- . "–")))
+  (org-modern-table-vertical 1)
+  (org-modern-table-horizontal 0.2)
+  (org-modern-todo-faces
+   '(("NEXT"      :foreground "#50fa7b" :weight bold)
+     ("WAIT"      :foreground "#f1fa8c")
+     ("CANCELLED" :foreground "#6272a4" :strike-through t))))
+
+;; Author recommends :config (not :hook) and a high hook depth so this attaches
+;; after org-indent has set up. See https://github.com/jdtsmith/org-modern-indent
+(use-package org-modern-indent
+  :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+  :after org
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autoemphasis t)
+  (org-appear-autolinks t)
+  (org-appear-autosubmarkers t))
 
 
 ;;; Org Roam -----
 (use-package org-roam
   :custom
-  (org-roam-directory (file-truename "~/Notes"))
+  (org-roam-directory (file-truename "~/org/roam"))
   :general
   (:prefix "C-c n"
    "f" 'org-roam-node-find
@@ -312,7 +353,7 @@
   (unless (file-exists-p org-roam-directory)
     (make-directory org-roam-directory t))
   (org-roam-db-autosync-mode)
-  ;; New roam files are added to agenda immediately on creation
+  ;; Add newly captured roam files to the agenda immediately
   (add-hook 'org-roam-capture-new-node-hook
             (lambda ()
               (when buffer-file-name
@@ -321,12 +362,51 @@
 
 ;;; Which Key -----
 (use-package which-key
-  :diminish which-key-mode
   :config
   (which-key-mode)
   (which-key-setup-minibuffer))
 
-;;; Meow - Modal editing (Colemak) -----
-;; (use-package meow ...)
 
+;;; Mail (mu4e) -----
+(let ((nix-mu4e-file (expand-file-name "nix-mu4e.el" user-emacs-directory)))
+  (if (file-exists-p nix-mu4e-file)
+      (load nix-mu4e-file nil 'nomessage)
+    (warn "nix-mu4e.el not found. Ensure you ran `home-manager switch`.")))
+
+(setq shr-use-colors nil)
+(use-package mu4e
+  :straight nil                              ; Nix-provided; do not let straight fetch
+  :commands (mu4e mu4e-update-mail-and-index)
+  :general
+  ("C-c m" 'mu4e)
+  :custom
+  (mu4e-get-mail-command "mbsync -a")
+  (mu4e-change-filenames-when-moving t)      ; REQUIRED with mbsync, else UID clashes
+  (mu4e-confirm-quit nil)
+  (mu4e-sent-messages-behavior 'delete)      ; Proton saves Sent server-side; no 2nd copy
+  :config
+  ;; Folders are relative to the mu root (~/Mail). Account subdir is `proton`.
+  ;; VERIFY exact names with `ls ~/Mail/proton` and adjust if needed.
+  (setq mu4e-drafts-folder "/proton/Drafts"
+        mu4e-sent-folder   "/proton/Sent"
+        mu4e-trash-folder  "/proton/Trash"
+        mu4e-refile-folder "/proton/Archive")
+
+  (setq mu4e-maildir-shortcuts
+        '((:maildir "/proton/Inbox"   :key ?i)
+          (:maildir "/proton/Sent"    :key ?s)
+          (:maildir "/proton/Drafts"  :key ?d)
+          (:maildir "/proton/Archive" :key ?a)
+          (:maildir "/proton/Trash"   :key ?t)))
+
+  ;; Send via msmtp -> Bridge. f-is-evil + --read-envelope-from is the canonical
+  ;; msmtp/message-mode pairing; account is picked from the From: header.
+  (setq sendmail-program (executable-find "msmtp")
+        message-send-mail-function #'message-send-mail-with-sendmail
+        message-sendmail-f-is-evil t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-kill-buffer-on-exit t)
+
+  (setq user-mail-address "vp@paulaus.com"
+        user-full-name "Vytautas"))
 ;;; init.el ends here

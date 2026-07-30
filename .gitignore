@@ -15,3 +15,9 @@ private/
 # aria2 DHT files
 home/aria2/dht.dat
 home/aria2/dht6.dat
+
+# Generated repo dump (may contain contents of any file in the tree)
+project.out.txt
+
+# Local-machine Claude Code settings
+.claude/settings.local.json

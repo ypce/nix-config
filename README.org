@@ -1,0 +1,79 @@
+#+title: nix-config - Setup macOS
+#+subtitle: nix-darwin + home-manager + flakes · Determinate Nix · Homebrew on
+#+options: toc:nil num:nil
+
+Host =Seaholly= · user =vp= · =aarch64-darwin=.
+
+Determinate manages Nix (=determinateNix.enable = true=); nix-darwin manages
+macOS; nix-homebrew bootstraps brew and the casks/taps. The first =switch= does
+everything except the few non-declarative bits below.
+
+* Steps
+
+1. *Xcode CLT* - gives you =git= and =/usr/bin/tic= (for the emacs terminfo step):
+   #+begin_src bash
+   xcode-select --install
+   #+end_src
+
+2. *Hostname* - not set by the flake, so do it by hand:
+   #+begin_src bash
+   sudo scutil --set ComputerName Seaholly
+   sudo scutil --set HostName Seaholly
+   sudo scutil --set LocalHostName Seaholly
+   #+end_src
+
+3. *Install Determinate Nix* - the shell one-liner (installs Determinate Nix by
+   default now; no flag needed). Enables =nix-command= + =flakes= automatically:
+   #+begin_src bash
+   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+   #+end_src
+   (Determinate's officially-recommended macOS path is the graphical
+   =Determinate.pkg=; the shell installer is equivalent.)
+
+4. *Clone* - HTTPS for the first clone, since the SSH key isn't linked yet:
+   #+begin_src bash
+   git clone https://github.com/ypce/nix-config.git ~/Git/nix-config
+   cd ~/Git/nix-config
+   #+end_src
+
+5. *First switch* - recent nix-darwin activates as root:
+   #+begin_src bash
+   sudo nix run nix-darwin -- switch --flake .#Seaholly
+   #+end_src
+   If it aborts complaining about existing =/etc= files, move each listed file
+   aside and re-run:
+   #+begin_src bash
+   sudo mv /etc/bashrc  /etc/bashrc.before-nix-darwin
+   sudo mv /etc/zshrc   /etc/zshrc.before-nix-darwin
+   # …whatever else it names, then re-run the switch
+   #+end_src
+   First run also bootstraps Homebrew and builds the casks (incl. emacs-plus) -
+   the emacs-plus build can take a while.
+
+6. *Login shell → fish* - accepted because =/run/current-system/sw/bin/fish= is
+   in =/etc/shells= via =environment.shells=:
+   #+begin_src bash
+   chsh -s /run/current-system/sw/bin/fish
+   #+end_src
+   Open a fresh terminal (or re-login) for it to take.
+
+7. *SSH remote* (optional) - once the switch has linked your keys/=allowed_signers=:
+   #+begin_src bash
+   git -C ~/Git/nix-config remote set-url origin git@github.com:ypce/nix-config.git
+   #+end_src
+
+* Daily use
+
+#+begin_src bash
+nix-rebuild               # sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly
+nix flake update && nix-rebuild
+darwin-rebuild --rollback # if a switch breaks something
+#+end_src
+
+* One-time manual macOS bits (not nix-managed)
+
+- Keyboard → Shortcuts → Mission Control: uncheck all.
+- Keyboard → Shortcuts → Input Sources: uncheck all.
+- Caps Lock is mapped to *Escape* by the flake
+  (=system.keyboard.remapCapsLockToEscape=); if you want Control instead, drop
+  that option and set it under Modifier Keys.fresh macOS 

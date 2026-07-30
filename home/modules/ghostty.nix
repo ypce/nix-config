@@ -1,13 +1,12 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Ghostty config file (homebrew will install the app)
   home.file.".config/ghostty/config".text = ''
     # appearance
     theme = pro
-    # alpha-blending = native
-    # background-opacity = 0.90
-    # background-blur = 20
+    alpha-blending = native
+    background-opacity = 0.90
+    background-blur = 20
     window-colorspace = display-p3
     macos-titlebar-style = tabs
     macos-titlebar-proxy-icon = hidden
@@ -32,34 +31,25 @@
     font-variation-bold-italic = wght=800
     window-title-font-family = Aeonik Mono
 
-    # keys
-    keybind = ctrl+a>r=reload_config
-    keybind = ctrl+a>d=close_surface
-    keybind = ctrl+a>w=new_window
-    keybind = ctrl+a>t=new_tab
-    keybind = ctrl+a>u=next_tab
-    keybind = ctrl+a>l=previous_tab
-    keybind = ctrl+a>comma=move_tab:-1
-    keybind = ctrl+a>period=move_tab:1
-    keybind = ctrl+a>k=new_split:right
-    keybind = ctrl+a>m=new_split:down
-    keybind = ctrl+a>h=goto_split:left
-    keybind = ctrl+a>n=goto_split:bottom
-    keybind = ctrl+a>e=goto_split:top
-    keybind = ctrl+a>i=goto_split:right
-    keybind = ctrl+a>z=toggle_split_zoom
-    keybind = ctrl+a>x=equalize_splits
-    keybind = ctrl+a>1=goto_tab:1
-    keybind = ctrl+a>2=goto_tab:2
-    keybind = ctrl+a>3=goto_tab:3
-    keybind = ctrl+a>4=goto_tab:4
-    keybind = ctrl+a>5=goto_tab:5
-    keybind = ctrl+a>6=goto_tab:6
-    keybind = ctrl+a>7=goto_tab:7
-    keybind = ctrl+a>8=goto_tab:8
-    keybind = ctrl+a>9=goto_tab:9
+    # safety nets
+    confirm-close-surface = always
+    quit-after-last-window-closed = false
+
+    # shell integration so OSC 133, OSC 7, cursor shape etc. all work
+    shell-integration = detect
+    shell-integration-features = cursor,sudo,title
+
+    # keep Cmd-based defaults (Cmd+T/W/N/D, Cmd+Shift+D, Cmd+[/], Cmd+1..9, Cmd+Alt+arrows)
+    # only add the actions Ghostty doesn't ship a default for:
+    keybind = cmd+shift+r=reload_config
+    keybind = cmd+shift+e=equalize_splits
+    keybind = cmd+shift+z=toggle_split_zoom
+    keybind = cmd+shift+left=move_tab:-1
+    keybind = cmd+shift+right=move_tab:1
+
+    # if ever want to unbind a Ghostty default that collides with Emacs:
+    # keybind = ctrl+tab=unbind
   '';
-  
-  # Custom theme
+
   home.file.".config/ghostty/themes/pro".source = ../ghostty/themes/pro;
 }

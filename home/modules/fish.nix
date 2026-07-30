@@ -18,21 +18,12 @@
     
     # Environment variables
     shellInit = ''
-      if test "$TERM" = "xterm-ghostty"
-        set -gx TERM xterm-256color
-      end
-
-      # Default Editor
-      set -gx EDITOR hx
-      set -gx VISUAL hx
-
       # Colors for CLI tools
       set -gx CLICOLOR 1
       set -gx LSCOLORS ExFxCxDxBxegedabagacad
-      
+
       # Prevent homebrew auto-update
       set -gx HOMEBREW_NO_AUTO_UPDATE 1
-      
     '';
     
     # Aliases
@@ -54,13 +45,17 @@
       
       # Tools
       edaemon = "emacs --bg-daemon";
-      
+
       # Grep with color
       grep = "grep --color=auto";
     };
     
     # Fish-specific functions
     functions = {
+      mergepdf = {
+        body = ''"/System/Library/Automator/Combine PDF Pages.action/Contents/MacOS/join" $argv'';
+      };
+
       # Navigation function - back and list
       b = ''
         cd -
@@ -73,21 +68,6 @@
         test -n "$dir"; and cd "$dir"
       '';
 
-      l = ''
-        set date (date +"%Y-%m-%d")
-        set time (date +"%H:%M")
-        set daily_file $HOME/Notes/daily/$date.org
-
-        if test (count $argv) -eq 0
-            set tmpfile (mktemp /tmp/log-XXXXXX.org)
-            e $tmpfile
-            and echo "** $time" >> $daily_file
-            and cat $tmpfile >> $daily_file
-            rm $tmpfile
-        else
-            echo "** $time $argv" >> $daily_file
-        end
-      '';
     };
     
     # Fish plugins (optional, fish is great without them)

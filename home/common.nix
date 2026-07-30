@@ -1,5 +1,6 @@
-# Common home-manager configurations
-# Contains options common to any host, such as editor and shell configurations.
+# Common home-manager config - runs on every host (macOS and future Linux).
+# Keep this to portable CLI tooling only. Anything GUI or OS-flavoured lives
+# in the per-platform home file (darwin.nix / linux.nix).
 
 { config, pkgs, userConfig, lib, ... }:
 let
@@ -8,8 +9,6 @@ in
 {
   imports = [
     ./modules/aria2-common.nix
-    ./modules/ghostty.nix
-    ./modules/fish.nix
     ./modules/helix.nix
     ./modules/yazi.nix
   ];
@@ -18,19 +17,19 @@ in
     jless
     just
     fd
+    jq
     gh
     glow
     fzf
     htop
     btop
     bat
-    helix
-    lazygit
+    bitwarden-cli
+      lazygit
     nixpkgs-fmt
     p7zip
     ncdu
     ripgrep
-    tmux
     tree
     exiftool
     rclone
@@ -67,6 +66,7 @@ in
         user = "git";
       };
       "*" = {
+        extraOptions.SetEnv = "TERM=xterm-256color";
         identityFile = "${config.home.homeDirectory}/.ssh/${userConfig.sshKey}";
         controlMaster = "auto";
         controlPersist = "1h";
@@ -80,28 +80,6 @@ in
 
   home.sessionVariables = {
     NIXCONFIG_DIR = "${config.home.homeDirectory}/Git/nix-config";
-  };
-
-  programs.tmux = {
-    enable = true;
-    mouse = true;
-    prefix = "C-Space";
-    extraConfig = ''
-      bind | split-window -h
-      bind - split-window -v
-      unbind '"'
-      unbind %
-    '';
-    plugins = with pkgs; [
-      tmuxPlugins.prefix-highlight
-      {
-        plugin = tmuxPlugins.prefix-highlight;
-        extraConfig = ''
-          set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
-          set -g status-right '#{prefix_highlight} | %a %Y-%m-%d %H:%M'
-        '';
-      }
-    ];
   };
 }
   

@@ -156,7 +156,7 @@
             feature_paths = true;
           };
           environment = {
-            RUST_LOG = "info,simple-completion-langauge-server=info";
+            RUST_LOG = "info,simple-completion-language-server=info";
             LOG_FILE = "/tmp/completion.log";
           };
         };
