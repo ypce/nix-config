@@ -23,6 +23,7 @@
       "mac-mouse-fix"
       "museeks"
       "proton-mail-bridge"
+      "rawtherapee"
       "slack"
       "tuta-mail"
       "vnc-viewer"
