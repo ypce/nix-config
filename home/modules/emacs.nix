@@ -1,15 +1,13 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Emacs is installed via Homebrew (emacs-plus) - see
-  # systems/mac-configuration-home.nix. This module only manages the config
-  # files + a truecolor terminfo entry; it does NOT install Emacs, so it won't
-  # collide with the brew build. Daemon is started via the `edaemon` fish alias.
-
-  home.file.".emacs.d/init.el".source = ../emacs/init.el;
-  home.file.".emacs.d/early-init.el".source = ../emacs/early-init.el;
-  home.file.".emacs.d/programming.el".source = ../emacs/programming.el;
-  home.file.".emacs.d/dracula-pro-pro-theme.el".source = ../emacs/themes/dracula-pro-pro-theme.el;
+  # Homebrew installs Emacs (emacs-plus); see systems/homebrew.nix.
+  # The config lives in its own repo. Clone it into place:
+  #   git clone git@github.com:ypce/emacs.d.git ~/.emacs.d
+  # This module does not symlink config files. This permits live edits
+  # and use on machines without nix. This module only supplies the
+  # truecolor terminfo entry and the emacs-plus build config. The mail
+  # glue (nix-mu4e.el) comes from modules/email.nix.
 
   # Use macOS /usr/bin/tic - nixpkgs tic uses hex paths (78/), macOS ncurses
   # uses letter paths (x/), so the nix derivation approach silently produces
@@ -33,8 +31,8 @@ TERMINFO
   home.file.".config/emacs-plus/build.yml".text = ''
     # icon from the community gallery
     icon: modern-purple-flat
-    
-    # Inject macOS PATH into Emacs 
+
+    # Inject macOS PATH into Emacs
     inject_path: true
   '';
 }

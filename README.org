@@ -62,6 +62,11 @@ everything except the few non-declarative bits below.
    git -C ~/Git/nix-config remote set-url origin git@github.com:ypce/nix-config.git
    #+end_src
 
+8. *Emacs config* - the config lives in [[https://github.com/ypce/emacs.d][its own repo]]. See its README:
+   #+begin_src bash
+   git clone git@github.com:ypce/emacs.d.git ~/.emacs.d
+   #+end_src
+
 * Daily use
 
 #+begin_src bash
