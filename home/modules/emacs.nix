@@ -9,6 +9,21 @@
   # truecolor terminfo entry and the emacs-plus build config. The mail
   # glue (nix-mu4e.el) comes from modules/email.nix.
 
+  # Run the Emacs daemon as a launchd login service. brew services can
+  # not manage emacs-plus-app because it is a cask. Clients attach with
+  # `emacsclient -a ''`. KeepAlive restarts the daemon after kill-emacs.
+  # The edaemon fish alias stays as a manual fallback.
+  launchd.agents.emacs-daemon = {
+    enable = true;
+    config = {
+      ProgramArguments = [ "/Applications/Emacs.app/Contents/MacOS/Emacs" "--fg-daemon" ];
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "${config.home.homeDirectory}/Library/Logs/emacs-daemon.log";
+      StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/emacs-daemon.log";
+    };
+  };
+
   # Use macOS /usr/bin/tic - nixpkgs tic uses hex paths (78/), macOS ncurses
   # uses letter paths (x/), so the nix derivation approach silently produces
   # a terminfo file emacs-plus never finds.
