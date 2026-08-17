@@ -9,16 +9,26 @@
   # truecolor terminfo entry and the emacs-plus build config. The mail
   # glue (nix-mu4e.el) comes from modules/email.nix.
 
+  # Bootstrap the config on fresh machines: clone ypce/emacs.d if
+  # ~/.emacs.d does not exist yet. An existing clone is never touched,
+  # so live edits stay safe.
+  home.activation.cloneEmacsConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -e "$HOME/.emacs.d" ]; then
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clone git@github.com:ypce/emacs.d.git "$HOME/.emacs.d"
+    fi
+  '';
+
   # Run the Emacs daemon as a launchd login service. brew services can
   # not manage emacs-plus-app because it is a cask. Clients attach with
-  # `emacsclient -a ''`. KeepAlive restarts the daemon after kill-emacs.
+  # `emacsclient -a ''`. KeepAlive.SuccessfulExit = false restarts the
+  # daemon after a crash but lets kill-emacs (exit 0) actually stop it.
   # The edaemon fish alias stays as a manual fallback.
   launchd.agents.emacs-daemon = {
     enable = true;
     config = {
       ProgramArguments = [ "/Applications/Emacs.app/Contents/MacOS/Emacs" "--fg-daemon" ];
       RunAtLoad = true;
-      KeepAlive = true;
+      KeepAlive = { SuccessfulExit = false; };
       StandardOutPath = "${config.home.homeDirectory}/Library/Logs/emacs-daemon.log";
       StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/emacs-daemon.log";
     };
