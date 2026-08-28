@@ -15,6 +15,7 @@
     packages = with pkgs; [
       mpv
       fava
+      python312Packages.beanquery
       unstable.claude-code
       unstable.codex
       qmk
