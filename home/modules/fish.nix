@@ -41,10 +41,20 @@
       # Git
       gst = "git status";
       gc = "git clone";
-      lg = "lazygit";
       
       # Tools
-      edaemon = "emacs --bg-daemon";
+      # The Emacs daemon is a launchd agent. See modules/emacs.nix.
+      # estop exits with status 0, so launchd keeps the daemon down
+      # until ereload starts it again.
+      #
+      # A bare save-buffers-kill-emacs asks yes-or-no-p when buffers are
+      # modified or processes are live. The daemon has no frame to ask
+      # in, so it blocks in the minibuffer forever and stops answering
+      # the socket. The t argument saves file buffers without asking,
+      # and confirm-kill-processes nil skips the process question.
+      ereload = "launchctl kickstart -k gui/(id -u)/org.nix-community.home.emacs-daemon";
+      estop = "emacsclient -e '(let ((confirm-kill-processes nil)) (save-buffers-kill-emacs t))'";
+      estatus = "launchctl print gui/(id -u)/org.nix-community.home.emacs-daemon";
 
       # Grep with color
       grep = "grep --color=auto";
@@ -55,6 +65,13 @@
       mergepdf = {
         body = ''"/System/Library/Automator/Combine PDF Pages.action/Contents/MacOS/join" $argv'';
       };
+
+      # lazygit is gone. Open magit on the current directory instead.
+      # The daemon does not share the shell working directory, so pass it.
+      lg = ''
+        set -x TERM xterm-emacs
+        emacsclient -c -nw -a "" -e "(magit-status \"$PWD\")"
+      '';
 
       # Navigation function - back and list
       b = ''

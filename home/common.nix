@@ -9,8 +9,6 @@ in
 {
   imports = [
     ./modules/aria2-common.nix
-    ./modules/helix.nix
-    ./modules/yazi.nix
   ];
 
   home.packages = with pkgs; [
@@ -19,13 +17,11 @@ in
     fd
     jq
     gh
-    glow
     fzf
     htop
     btop
     bat
     bitwarden-cli
-      lazygit
     nixpkgs-fmt
     p7zip
     ncdu
@@ -39,6 +35,11 @@ in
     parallel
     httpie
     rsync
+
+    # Language servers for eglot.
+    gopls
+    golangci-lint-langserver
+    marksman
     ];
 
   programs.git = {
@@ -64,6 +65,10 @@ in
       "github github.com" = {
         hostname = "github.com";
         user = "git";
+      };
+      "yarrow yarrow.paulaus.com" = {
+        hostname = "yarrow.paulaus.com";
+        extraOptions.HostKeyAlias = "yarrow.local";
       };
       "*" = {
         extraOptions.SetEnv = "TERM=xterm-256color";

@@ -19,17 +19,30 @@
     unfocused-split-opacity = 1
 
     # fonts
+    # Family names must match what the font files report. AeonikMono
+    # installs from private/fonts as "AeonikMono Nerd Font Mono", not
+    # "Aeonik Mono". The old names matched nothing, so Ghostty fell back
+    # to its default face.
+    #
+    # These are static OTFs with one file per weight, not variable
+    # fonts (no fvar table), so font-variation had nothing to vary.
+    # AeonikMono carries Light, Regular, Medium and Bold as separate
+    # faces of one family, so pick the weight with font-style, which
+    # takes the preferred subfamily name. The old wght=300 meant Light
+    # and wght=800 meant the heaviest face, which is Bold.
+    #
+    # Give a family name, never a face name. Bold and italic faces come
+    # from the family, so font-family-bold is unnecessary. Read the
+    # family from `ghostty +list-fonts`, where the unindented line is
+    # the family. The name table says "CaskaydiaCove NFM", but CoreText
+    # presents the preferred family, "CaskaydiaCove Nerd Font Mono".
     font-size = 20
-    font-family = Aeonik Mono
-    font-variation = wght=300
-    font-variation = wdth=100
-    font-family-bold = Aeonik Mono Bold
-    font-variation-bold = wght=800
+    font-family = AeonikMono Nerd Font Mono
+    font-style = Light
+    font-style-bold = Bold
     font-family-italic = CaskaydiaCove Nerd Font Mono
-    font-variation-italic = wght=200
     font-family-bold-italic = CaskaydiaCove Nerd Font Mono
-    font-variation-bold-italic = wght=800
-    window-title-font-family = Aeonik Mono
+    window-title-font-family = AeonikMono Nerd Font Mono
 
     # safety nets
     confirm-close-surface = always

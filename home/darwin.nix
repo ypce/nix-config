@@ -6,13 +6,13 @@
     ./modules/fish.nix
     ./modules/ghostty.nix
     ./modules/emacs.nix
-    ./modules/email.nix 
   ];
 
   home = {
     stateVersion = "25.05";
     
     packages = with pkgs; [
+      uv
       mpv
       fava
       python312Packages.beanquery
@@ -28,12 +28,20 @@
     activation.linkPrivateFiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
       PRIVATE_DIR="$HOME/Git/nix-config/private"
 
-      # Link fonts
-      $DRY_RUN_CMD mkdir -p $HOME/.local
-      if [ -d "$PRIVATE_DIR/.local/fonts" ]; then
-        $DRY_RUN_CMD rm -rf $HOME/.local/fonts
-        $DRY_RUN_CMD ln -sf "$PRIVATE_DIR/.local/fonts" $HOME/.local/fonts
-        echo "Linked private fonts"
+      # Link fonts. macOS reads ~/Library/Fonts, never ~/.local/fonts,
+      # and the fonts live in private/fonts, so the old link pointed at
+      # an empty directory macOS ignored. Link each file, and leave any
+      # existing file alone so a manual install is never clobbered.
+      if [ -d "$PRIVATE_DIR/fonts" ]; then
+        $DRY_RUN_CMD mkdir -p "$HOME/Library/Fonts"
+        for font in "$PRIVATE_DIR/fonts"/*; do
+          [ -e "$font" ] || continue
+          target="$HOME/Library/Fonts/$(basename "$font")"
+          if [ ! -e "$target" ]; then
+            $DRY_RUN_CMD ln -s "$font" "$target"
+            echo "Linked font $(basename "$font")"
+          fi
+        done
       fi
       
       # Link/copy SSH files
@@ -65,6 +73,8 @@
     fish = {
       shellAliases = {
         nix-rebuild = "sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly";
+        # --flake makes this work from any directory, not just the repo.
+        nix-update = "nix flake update nixpkgs-unstable --flake $NIXCONFIG_DIR";
       };
     };
   };
