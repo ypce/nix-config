@@ -3,9 +3,6 @@
 # in the per-platform home file (darwin.nix / linux.nix).
 
 { config, pkgs, userConfig, lib, ... }:
-let
-  flakeRoot = builtins.toString ./.;
-in
 {
   imports = [
     ./modules/aria2-common.nix
@@ -57,24 +54,23 @@ in
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    extraConfig = lib.mkBefore ''
-    Include ${config.home.homeDirectory}/.ssh/config.private
-    AddKeysToAgent yes
-    '';
-    matchBlocks = {
+    includes = [ "${config.home.homeDirectory}/.ssh/config.private" ];
+    settings = {
       "github github.com" = {
-        hostname = "github.com";
-        user = "git";
+        HostName = "github.com";
+        User = "git";
       };
       "yarrow yarrow.paulaus.com" = {
-        hostname = "yarrow.paulaus.com";
-        extraOptions.HostKeyAlias = "yarrow.local";
+        HostName = "yarrow.paulaus.com";
+        HostKeyAlias = "yarrow.local";
       };
       "*" = {
-        extraOptions.SetEnv = "TERM=xterm-256color";
-        identityFile = "${config.home.homeDirectory}/.ssh/${userConfig.sshKey}";
-        controlMaster = "auto";
-        controlPersist = "1h";
+        AddKeysToAgent = "yes";
+        SetEnv.TERM = "xterm-256color";
+        IdentityFile = "${config.home.homeDirectory}/.ssh/${userConfig.sshKey}";
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/control-%C";
+        ControlPersist = "1h";
       };
     };
   };

@@ -71,9 +71,19 @@ everything except the few non-declarative bits below.
 
 #+begin_src bash
 nix-rebuild               # sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly
-nix flake update && nix-rebuild
+nix-update                # Update only the unstable package input.
+nix-update-all            # Update all inputs within their configured release branches.
+nix-rebuild               # Apply the updated inputs and configuration.
+brew-upgrade              # Upgrade the applications in the active Brewfile.
 darwin-rebuild --rollback # if a switch breaks something
 #+end_src
+
+Routine rebuilds install missing Homebrew applications but do not upgrade existing applications.
+After =nix-update-all= and =nix-rebuild=, run =brew-upgrade= to apply the updated Homebrew definitions.
+The stable inputs use release 26.05. Keep the existing =stateVersion= values during release upgrades.
+
+The =j= command searches previously visited directories through zoxide.
+Use =cd= to visit a new directory before you search for it with =j=.
 
 * One-time manual macOS bits (not nix-managed)
 

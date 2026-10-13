@@ -20,8 +20,8 @@ let
     fi
 
     echo "=== nix-gc $(date) ==="
-    /nix/var/nix/profiles/default/bin/nix-collect-garbage --delete-older-than 30d
-    mkdir -p "$(dirname "$stamp")"
+    /nix/var/nix/profiles/default/bin/nix-collect-garbage --delete-older-than 30d || exit $?
+    mkdir -p "$(dirname "$stamp")" || exit $?
     date +%s > "$stamp"
   '';
 in

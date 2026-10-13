@@ -79,10 +79,9 @@
         and ls -aG
       '';
 
-      # Fuzzy directory navigation with fzf
+      # Search previously visited directories with zoxide.
       j = ''
-        set -l dir (fd -t d -H --max-depth 5 . ~ 2>/dev/null | fzf --reverse --height 40% --prompt="Navigate to: ")
-        test -n "$dir"; and cd "$dir"
+        zi $argv
       '';
 
     };

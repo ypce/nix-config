@@ -23,7 +23,8 @@ in
   # Bootstrap the config on fresh machines: clone ypce/emacs.d if
   # ~/.emacs.d does not exist yet. An existing clone is never touched,
   # so live edits stay safe.
-  home.activation.cloneEmacsConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.cloneEmacsConfig =
+    lib.hm.dag.entryBetween [ "setupLaunchAgents" ] [ "linkPrivateFiles" "linkGeneration" ] ''
     if [ ! -e "$HOME/.emacs.d" ]; then
       $DRY_RUN_CMD ${pkgs.git}/bin/git clone git@github.com:ypce/emacs.d.git "$HOME/.emacs.d"
     fi
@@ -78,6 +79,24 @@ TERMINFO
     VISUAL = "emacsclient -c -nw -a ''";
   };
 
+  # ob-mermaid renders diagrams with mmdc. mmdc drives a headless
+  # Chromium through puppeteer. On darwin, nixpkgs ships it without a
+  # browser, so point it at Helium (a Chromium build from the
+  # helium-browser cask). Set the variable in a wrapper, not in
+  # sessionVariables, because the launchd daemon never reads the shell
+  # environment.
+  home.packages = [
+    (pkgs.symlinkJoin {
+      name = "mermaid-cli";
+      paths = [ pkgs.mermaid-cli ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/mmdc \
+          --set-default PUPPETEER_EXECUTABLE_PATH /Applications/Helium.app/Contents/MacOS/Helium
+      '';
+    })
+  ];
+
   home.file.".config/emacs-plus/build.yml".text = buildYml;
 
   # The seam between nix and Homebrew. nix owns build.yml, but the
@@ -92,7 +111,7 @@ TERMINFO
   # The icon lives in the app bundle, so a running daemon does not
   # block the change and is not restarted here.
   home.activation.applyEmacsBuildConfig =
-    lib.hm.dag.entryBetween [ "startEmacsDaemon" ] [ "linkGeneration" ] ''
+    lib.hm.dag.entryBetween [ "setupLaunchAgents" "startEmacsDaemon" ] [ "linkGeneration" ] ''
       brew=/opt/homebrew/bin/brew
       stamp="${config.xdg.stateHome}/emacs-plus-build-yml.hash"
       want="${builtins.hashString "sha256" buildYml}"
@@ -115,9 +134,8 @@ TERMINFO
       elif [ "$(cat "$stamp" 2>/dev/null || true)" = "$want" ]; then
         :
       elif ! "$brew" list --cask emacs-plus-app >/dev/null 2>&1; then
-        # Not installed yet. The homebrew activation installs it below,
-        # and its postflight reads the build.yml we just wrote.
-        write_stamp
+        echo "Homebrew has not installed emacs-plus-app. Retry the system rebuild." >&2
+        exit 1
       else
         echo "emacs-plus build.yml changed, reinstalling the cask..."
         if $DRY_RUN_CMD "$brew" reinstall --cask emacs-plus-app; then

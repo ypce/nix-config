@@ -24,7 +24,7 @@
         exec emacsclient -c -nw -a "" "$@"
       '')
     ];
-    
+
     activation.linkPrivateFiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
       PRIVATE_DIR="$HOME/Git/nix-config/private"
 
@@ -46,17 +46,20 @@
       
       # Link/copy SSH files
       if [ -d "$PRIVATE_DIR/.ssh" ]; then
-        $DRY_RUN_CMD mkdir -p $HOME/.ssh
+        $DRY_RUN_CMD mkdir -p "$HOME/.ssh"
     
         for file in "$PRIVATE_DIR/.ssh"/*; do
+          [ -f "$file" ] || continue
           filename=$(basename "$file")
           target="$HOME/.ssh/$filename"
       
           # Copy private keys (not symlink) with correct permissions
           if [[ "$filename" != *.pub && "$filename" != "config"* && "$filename" != "known_hosts"* ]]; then
-            $DRY_RUN_CMD cp "$file" "$target"
+            if ! ${pkgs.diffutils}/bin/cmp -s "$file" "$target"; then
+              $DRY_RUN_CMD cp "$file" "$target"
+              echo "Copied $filename (private key)"
+            fi
             $DRY_RUN_CMD chmod 600 "$target"
-            echo "Copied $filename (private key)"
           else
             # Symlink everything else (config files, public keys)
             $DRY_RUN_CMD ln -sf "$file" "$target"
@@ -75,6 +78,8 @@
         nix-rebuild = "sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly";
         # --flake makes this work from any directory, not just the repo.
         nix-update = "nix flake update nixpkgs-unstable --flake $NIXCONFIG_DIR";
+        nix-update-all = "nix flake update --flake $NIXCONFIG_DIR";
+        brew-upgrade = "brew bundle";
       };
     };
   };
