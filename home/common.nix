@@ -32,6 +32,9 @@
     parallel
     httpie
     rsync
+    sops
+    age
+    gitleaks
 
     # Language servers for eglot.
     gopls
@@ -81,6 +84,8 @@
 
   home.sessionVariables = {
     NIXCONFIG_DIR = "${config.home.homeDirectory}/Git/nix-config";
+    # Same key path on macOS and Linux. sops uses ~/Library/Application Support on macOS.
+    SOPS_AGE_KEY_FILE = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
   };
 }
   
