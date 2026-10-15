@@ -33,6 +33,7 @@ in
       "leader-key"
       "localsend"
       "loop"
+      "moonlight"
       "museeks"
       "rawtherapee"
       "slack"
