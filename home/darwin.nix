@@ -6,6 +6,7 @@
     ./modules/fish.nix
     ./modules/ghostty.nix
     ./modules/emacs.nix
+    ./modules/dictate.nix
   ];
 
   home = {
