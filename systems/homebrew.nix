@@ -35,6 +35,7 @@ in
       "loop"
       "moonlight"
       "museeks"
+      "proton-mail-bridge"
       "rawtherapee"
       "slack"
       "tuta-mail"
