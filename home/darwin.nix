@@ -86,6 +86,24 @@
         export TERM=xterm-emacs
         exec emacsclient -c -nw -a "" "$@"
       '')
+      # Scripts, not fish aliases, so that eshell and other shells find them.
+      # Absolute paths, because an Emacs started from the Dock has a short PATH.
+      # --flake makes these work from any directory, not just the repo.
+      (pkgs.writeShellScriptBin "nix-rebuild" ''
+        exec sudo /run/current-system/sw/bin/darwin-rebuild switch \
+          --flake "${config.home.sessionVariables.NIXCONFIG_DIR}#Seaholly" "$@"
+      '')
+      (pkgs.writeShellScriptBin "nix-update" ''
+        exec /nix/var/nix/profiles/default/bin/nix flake update nixpkgs-unstable \
+          --flake "${config.home.sessionVariables.NIXCONFIG_DIR}" "$@"
+      '')
+      (pkgs.writeShellScriptBin "nix-update-all" ''
+        exec /nix/var/nix/profiles/default/bin/nix flake update \
+          --flake "${config.home.sessionVariables.NIXCONFIG_DIR}" "$@"
+      '')
+      (pkgs.writeShellScriptBin "brew-upgrade" ''
+        exec /opt/homebrew/bin/brew bundle "$@"
+      '')
     ];
 
     activation.linkPrivateFiles = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -135,15 +153,5 @@
 
   programs = {
     home-manager.enable = true;
-    
-    fish = {
-      shellAliases = {
-        nix-rebuild = "sudo darwin-rebuild switch --flake $NIXCONFIG_DIR/.#Seaholly";
-        # --flake makes this work from any directory, not just the repo.
-        nix-update = "nix flake update nixpkgs-unstable --flake $NIXCONFIG_DIR";
-        nix-update-all = "nix flake update --flake $NIXCONFIG_DIR";
-        brew-upgrade = "brew bundle";
-      };
-    };
   };
 }
