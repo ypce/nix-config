@@ -20,7 +20,6 @@
       unstable.claude-code
       unstable.codex
       qmk
-      (pkgs.writeShellScriptBin "e" ''
       # Copy files from a camera in PTP mode (the Leica M11). A PTP camera is not a disk:
       # it is not in /Volumes. gphoto2 reads it over USB.
       gphoto2
@@ -84,6 +83,11 @@
           echo "camera-import: all files are in $dest, $((SECONDS - start))s in total"
         fi
       '')
+      # Test SD cards before a shoot: f3write /Volumes/CARD, then f3read /Volumes/CARD.
+      # f3 fills the free space with test data and reads it back. It finds bad flash
+      # and fake cards that show more capacity than they have.
+      f3
+      (pkgs.writeShellScriptBin "e" ''
         export TERM=xterm-emacs
         exec emacsclient -c -nw -a "" "$@"
       '')
