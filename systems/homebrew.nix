@@ -37,10 +37,10 @@ in
       "museeks"
       "proton-mail-bridge"
       "rawtherapee"
+      "rustdesk"
       "slack"
       "tuta-mail"
       "vnc-viewer"
-      "whatsapp"
       "signal"
       "tailscale-app"
       "libreoffice"
@@ -50,6 +50,7 @@ in
     masApps = {
       "Yubico Authenticator" = 1497506650;
       "Windows App" = 1295203466;
+      WhatsApp = 310633997;
     };
   };
 

@@ -62,7 +62,8 @@ in
       trackpad.Clicking = true;
 
       CustomUserPreferences = {
-        NSGlobalDomain."com.apple.mouse.scaling" = -1.0;   # disable mouse acceleration (linear tracking)
+        NSGlobalDomain."com.apple.mouse.linear" = true;    # disable mouse acceleration (linear tracking)
+        NSGlobalDomain."com.apple.mouse.scaling" = 1.0;    # pointer speed, 0.0-3.0 (-1 also kills speed)
       };
 
       controlcenter = {
